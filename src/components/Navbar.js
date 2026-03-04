@@ -30,6 +30,7 @@ export default function Navbar() {
         onKeyDown={e => e.key === 'Enter' && navigate('/')}
         aria-label="Go to gallery"
       >
+        <img src="/favicon.svg" alt="AutoGenesis logo" className="nav-logo-mark" />
         <span className="nav-logo-auto">AUTO</span>
         <span className="nav-logo-gen">GENESIS</span>
         <span className="nav-logo-dot" />

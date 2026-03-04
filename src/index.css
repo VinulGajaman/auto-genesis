@@ -424,6 +424,15 @@ img {
   flex-shrink: 0;
 }
 
+.nav-logo-mark {
+  width: 30px;
+  height: 30px;
+  filter: brightness(0) invert(1);
+  opacity: 1;
+  flex-shrink: 0;
+  margin-right: 2px;
+}
+
 .nav-logo-auto {
   font-family: var(--font-display);
   font-size: 24px;
