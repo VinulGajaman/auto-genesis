@@ -1,24 +1,43 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useCallback } from 'react';
+import { HashRouter, Routes, Route } from 'react-router-dom';
+import { AppProvider } from './context/AppContext';
+import Navbar from './components/Navbar';
+import LoadingScreen from './components/LoadingScreen';
+import Toast from './components/Toast';
+import BackToTop from './components/BackToTop';
+import CompareBar from './components/CompareBar';
+import Gallery from './pages/Gallery';
+import Passport from './pages/Passport';
+import Compare from './pages/Compare';
+import Swap from './pages/Swap';
+import AddVehicle from './pages/AddVehicle';
+import './index.css';
 
 function App() {
+  const [loading, setLoading] = useState(true);
+  const onLoadingComplete = useCallback(() => setLoading(false), []);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <AppProvider>
+      <HashRouter>
+        <LoadingScreen onComplete={onLoadingComplete} />
+        {!loading && (
+          <>
+            <Navbar />
+            <Routes>
+              <Route path="/" element={<Gallery />} />
+              <Route path="/passport/:id" element={<Passport />} />
+              <Route path="/compare" element={<Compare />} />
+              <Route path="/swap/:id" element={<Swap />} />
+              <Route path="/add-vehicle" element={<AddVehicle />} />
+            </Routes>
+            <CompareBar />
+            <Toast />
+            <BackToTop />
+          </>
+        )}
+      </HashRouter>
+    </AppProvider>
   );
 }
 

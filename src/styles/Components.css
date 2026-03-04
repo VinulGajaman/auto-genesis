@@ -1,0 +1,76 @@
+/* === COMPARE BAR (Sticky Bottom) === */
+.compare-bar {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  height: 72px;
+  background: var(--bg-elevated);
+  border-top: 2px solid var(--primary);
+  z-index: 900;
+  transform: translateY(100%);
+  transition: transform 0.3s ease;
+}
+.compare-bar.visible {
+  transform: translateY(0);
+  animation: slideUp 0.3s ease;
+}
+.compare-bar-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--sp-6);
+}
+.compare-bar-vehicles {
+  display: flex;
+  gap: var(--sp-6);
+}
+.compare-bar-vehicle {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+}
+.compare-bar-thumb {
+  width: 48px;
+  height: 32px;
+  border-radius: var(--r-sm);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.compare-bar-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.compare-bar-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.compare-bar-remove {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 18px;
+  padding: var(--sp-1);
+  transition: var(--t-fast);
+}
+.compare-bar-remove:hover { color: var(--red); }
+.compare-bar-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+}
+.compare-bar-clear {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 13px;
+  transition: var(--t-fast);
+}
+.compare-bar-clear:hover { color: var(--text-primary); }
+
+@media (max-width: 767px) {
+  .compare-bar-name { display: none; }
+}
