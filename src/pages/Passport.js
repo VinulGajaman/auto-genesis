@@ -11,7 +11,7 @@ import {
   MapPin, Ship, Building2, Flag, Calendar, Milestone, ChevronDown,
   Activity, Clock, Zap, TrendingDown,
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Line } from 'react-chartjs-2';
 import {
   Chart as ChartJS, CategoryScale, LinearScale, PointElement,
@@ -181,7 +181,7 @@ export default function Passport() {
                 >
                   <Text
                     ff="var(--font-display)"
-                    fz={{ base: 46, sm: 64, md: 80 }}
+                    fz={{ base: 36, sm: 64, md: 80 }}
                     lts="0.02em"
                     c="white"
                     lh={1}
