@@ -44,35 +44,55 @@
 
 ## 2. TECH STACK & DELIVERY FORMAT
 
-**Deliver as:** A single self-contained `index.html` file with all CSS in `<style>` and all JS in `<script>` tags. No build tools. No npm. Opens directly in browser by double-clicking.
+**Deliver as:** React 18 SPA (Create React App), served as static files. No server required for demo.
 
-**External CDN libraries only (loaded via script tags):**
+**Core Framework:** React 18 + React Router DOM v7 (HashRouter for GitHub Pages compatibility)
+
+**UI Component Library:** Mantine v7 — dark-theme, fully styled components with AutoGenesis brand overrides.
+
+```
+@mantine/core          — UI components (Button, Input, Select, Stepper, Table, Modal, ...)
+@mantine/hooks         — useDisclosure, usePrevious, etc.
+@mantine/form          — Form state + validation integration
+@mantine/notifications — Toast notification system (replaces custom Toast.js)
+@mantine/charts        — LineChart (replaces Chart.js on new pages)
+@emotion/react         — Mantine's CSS-in-JS engine
+```
+
+**State Management:**
+```
+zustand + immer        — Global state (compareList, toast, vehicle data)
+                         Replaces legacy React Context (AppContext.js)
+@tanstack/react-query  — Async data layer (ready for real API integration)
+```
+
+**Form Validation:**
+```
+react-hook-form        — Form state management
+zod                    — Schema-based declarative validation
+@hookform/resolvers    — Connects Zod to @mantine/form
+```
+
+**Icons:** `lucide-react` — consistent SVG icon system throughout
+
+**Fonts (Google Fonts via CDN):**
 ```html
-<!-- Fonts -->
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
-<!-- Chart.js for depreciation graph -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-
-<!-- Lucide icons (SVG icon system) -->
-<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+Bebas Neue   — Display font for headings, vehicle names
+DM Sans      — Body font for UI text, labels, buttons
 ```
 
-**No:** React, Vue, Angular, Tailwind, Bootstrap, jQuery. Pure vanilla JS + CSS.
+**Routing:** HashRouter (`#/`, `#/passport/:id`, `#/compare`, `#/swap/:id`, `#/add-vehicle`)
 
-**Routing:** All "pages" are `<div>` sections. Show/hide via JS with `display:none` / `display:block`. URL hash (`#gallery`, `#passport`, `#compare`, `#swap`) updated with `history.pushState()` for back-button support.
-
-**State management:** A single global `window.APP` object:
+**State shape:**
 ```javascript
-window.APP = {
-  vehicles: [],          // All 5 vehicle objects
-  currentVehicle: null,  // Currently viewed passport
-  compareList: [],       // Array of up to 2 vehicle IDs for compare
-  swapSource: null,      // Vehicle ID being offered for swap
-  activeTab: 'timeline', // Current passport tab
-  depreciationChart: null // Chart.js instance
-};
+// useAppStore (Zustand)
+{ compareList: string[], showToast(msg, type), clearCompare(), addToCompare(id) }
+
+// useVehicleStore (Zustand)
+{ vehicles: Vehicle[], getVehicleById(id), refreshCustomVehicles() }
 ```
+
+**File Architecture:** Feature-based (see `PROJECT_STRUCTURE.md` for full details)
 
 ---
 

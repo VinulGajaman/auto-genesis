@@ -243,3 +243,4 @@ const VEHICLES = [
 ];
 
 export default VEHICLES;
+export { VEHICLES };

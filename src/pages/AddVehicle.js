@@ -1,15 +1,14 @@
-import React, { useState, useRef, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import { PHASE_COLORS } from '../data/phaseColors';
-import { generateVehicleId, saveCustomVehicle, saveVehicleImage } from '../utils/vehicleStorage';
+import { generateVehicleId, saveCustomVehicle, saveVehicleImage, getCustomVehicleById, getVehicleImage } from '../utils/vehicleStorage';
 import {
     Select, SelectItem, Input, Textarea, Toggle, BadgeCard, StepHeader, FormGrid
 } from '../components/UIComponents';
 import {
     ArrowLeft, ArrowRight, Check, Plus, Trash2, Upload,
-    ChevronDown, ChevronUp, CheckCircle2, AlertCircle, ShieldCheck,
-    Gauge, User, AlertTriangle, Clock
+    ChevronDown, ChevronUp, CheckCircle2, AlertCircle
 } from 'lucide-react';
 import '../styles/AddVehicle.css';
 import '../components/UIComponents.css';
@@ -116,11 +115,51 @@ function validateStep(step, form) {
    MAIN COMPONENT
    ============================================================ */
 export default function AddVehicle() {
+    const { id: editId } = useParams();
     const [step, setStep] = useState(0);
     const [form, setForm] = useState(DEFAULT_FORM);
     const [fieldErrors, setFieldErrors] = useState({});
     const navigate = useNavigate();
     const { showToast } = useApp();
+
+    useEffect(() => {
+        if (editId) {
+            const existing = getCustomVehicleById(editId);
+            if (existing) {
+                // If it's a base64 image saved locally, fetch it via getsVehicleImage
+                const previewImg = existing.image?.startsWith('__ls__')
+                    ? getVehicleImage(editId)
+                    : existing.image;
+
+                setForm({
+                    make: existing.make || '',
+                    model: existing.model || '',
+                    variant: existing.variant || '',
+                    year: existing.year ? String(existing.year) : String(new Date().getFullYear()),
+                    color: existing.color || '',
+                    colorHex: existing.colorHex || '#888888',
+                    imageFile: null,
+                    imagePreview: previewImg || null,
+                    vin: existing.vin || '',
+                    chassisNo: existing.chassisNo || '',
+                    engineNo: existing.engineNo || '',
+                    fuelType: existing.fuelType || '',
+                    displacement: existing.displacement || '',
+                    transmission: existing.transmission || '',
+                    driveType: existing.driveType || '',
+                    bodyType: existing.bodyType || '',
+                    doors: existing.doors ? String(existing.doors) : '4',
+                    seats: existing.seats ? String(existing.seats) : '5',
+                    condition_grade: existing.condition_grade || 0,
+                    mileage: existing.mileage ? String(existing.mileage) : '',
+                    market_value_lkr: existing.market_value_lkr ? String(existing.market_value_lkr) : '',
+                    badges: existing.badges || { on_time_service: false, one_owner: false, no_accident: false, untampered_mileage: false },
+                    timeline: existing.timeline || [],
+                    depreciation: existing.depreciation?.map(d => ({ year: String(d.year), value: String(d.value) })) || [],
+                });
+            }
+        }
+    }, [editId]);
 
     const updateForm = useCallback((patch) => {
         setForm(prev => ({ ...prev, ...patch }));
@@ -164,10 +203,10 @@ export default function AddVehicle() {
     }
 
     function handleSubmit() {
-        const id = generateVehicleId();
-        if (form.imagePreview) saveVehicleImage(id, form.imagePreview);
+        const finalId = editId || generateVehicleId();
+        if (form.imagePreview) saveVehicleImage(finalId, form.imagePreview);
         const vehicle = {
-            id,
+            id: finalId,
             make: form.make.trim(),
             model: form.model.trim(),
             variant: form.variant.trim() || form.model.trim(),
@@ -189,7 +228,7 @@ export default function AddVehicle() {
             condition_grade: form.condition_grade,
             condition_label: GRADE_META[form.condition_grade]?.label || 'Fair',
             market_value_lkr: Number(form.market_value_lkr),
-            image: form.imagePreview ? `__ls__${id}` : '',
+            image: form.imagePreview ? `__ls__${finalId}` : '',
             thumbnailColor: form.colorHex,
             badges: form.badges,
             depreciation: form.depreciation
@@ -209,8 +248,8 @@ export default function AddVehicle() {
             })),
         };
         saveCustomVehicle(vehicle);
-        showToast(`${vehicle.make} ${vehicle.model} added successfully!`, 'success');
-        setTimeout(() => navigate('/'), 1400);
+        showToast(`${vehicle.make} ${vehicle.model} ${editId ? 'updated' : 'added'} successfully!`, 'success');
+        setTimeout(() => navigate('/profile'), 1400);
     }
 
     const hasErrors = Object.keys(fieldErrors).length > 0;
@@ -220,10 +259,10 @@ export default function AddVehicle() {
             <div className="add-vehicle-container">
                 {/* Header */}
                 <div className="add-vehicle-header">
-                    <button className="add-vehicle-back-btn" onClick={() => navigate('/')}>
-                        <ArrowLeft size={15} /> Back to Gallery
+                    <button className="add-vehicle-back-btn" onClick={() => navigate(editId ? '/profile' : '/')}>
+                        <ArrowLeft size={15} /> Back
                     </button>
-                    <h1 className="add-vehicle-title">Add New Vehicle</h1>
+                    <h1 className="add-vehicle-title">{editId ? 'Edit Vehicle Passport' : 'Add New Vehicle'}</h1>
                     <p className="add-vehicle-subtitle">Complete all 6 steps to create a full vehicle passport record.</p>
                 </div>
 

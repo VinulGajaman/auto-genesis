@@ -33,7 +33,7 @@ export default function Navbar() {
         <img src="/favicon.svg" alt="AutoGenesis logo" className="nav-logo-mark" />
         <span className="nav-logo-auto">AUTO</span>
         <span className="nav-logo-gen">GENESIS</span>
-        <span className="nav-logo-dot" />
+        {/* <span className="nav-logo-dot" /> */}
       </div>
 
       {/* Center nav links */}

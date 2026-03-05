@@ -22,7 +22,12 @@ export function getCustomVehicles() {
  */
 export function saveCustomVehicle(vehicle) {
     const existing = getCustomVehicles();
-    existing.push(vehicle);
+    const index = existing.findIndex(v => v.id === vehicle.id);
+    if (index >= 0) {
+        existing[index] = vehicle;
+    } else {
+        existing.push(vehicle);
+    }
     localStorage.setItem(VEHICLES_KEY, JSON.stringify(existing));
 }
 
@@ -65,3 +70,6 @@ export function getVehicleImage(id) {
 export function getCustomVehicleById(id) {
     return getCustomVehicles().find(v => v.id === id) || null;
 }
+
+/** Alias — used by AddVehicle feature */
+export const saveVehicle = saveCustomVehicle;
