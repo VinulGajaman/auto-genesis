@@ -11,6 +11,7 @@ import {
     ChevronRight, ChevronLeft, Plus, Minus, Send,
     Car, Cpu, Activity, Award, Clock, BookOpen, AlertCircle,
 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { step1Schema, step2Schema, step3Schema, step4Schema } from './schema/validation';
 import { useVehicleStore } from '../../store/useVehicleStore';
 import { useAppStore } from '../../store/useAppStore';
@@ -155,287 +156,299 @@ export default function AddVehicle() {
     };
 
     return (
-        <Container size="md" py="xl">
-            {/* Header */}
-            <Button variant="subtle" color="gray" leftSection={<ChevronLeft size={14} />}
-                onClick={() => navigate('/')} mb="lg">
-                Back to Gallery
-            </Button>
-            <Text ff="var(--font-display)" fz={40} c="white" lts="0.04em" mb={4}>ADD NEW VEHICLE</Text>
-            <Text c="dimmed" fz={14} mb="xl">Complete all 6 steps to create a full vehicle passport record.</Text>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+            <Container size="md" py="xl" style={{ marginTop: 80 }}>
+                {/* Header */}
+                <Button variant="subtle" color="gray" leftSection={<ChevronLeft size={14} />}
+                    onClick={() => navigate('/')} mb="lg">
+                    Back to Gallery
+                </Button>
+                <Text ff="var(--font-display)" fz={40} c="white" lts="0.04em" mb={4}>ADD NEW VEHICLE</Text>
+                <Text c="dimmed" fz={14} mb="xl">Complete all 6 steps to create a full vehicle passport record.</Text>
 
-            {/* Stepper */}
-            <Stepper active={active} onStepClick={setActive} size="sm" mb="xl" allowNextStepsSelect={false}>
-                {STEPS.map((step) => (
-                    <Stepper.Step key={step.label} label={step.label} icon={step.icon} />
-                ))}
-            </Stepper>
+                {/* Stepper */}
+                <Stepper active={active} onStepClick={setActive} size="sm" mb="xl" allowNextStepsSelect={false}>
+                    {STEPS.map((step) => (
+                        <Stepper.Step key={step.label} label={step.label} icon={step.icon} />
+                    ))}
+                </Stepper>
 
-            {/* Content panel */}
-            <Paper radius="xl" p="xl" style={{ border: '1px solid rgba(255,255,255,0.07)' }}>
-                {/* ── Step 0: Basic Info ── */}
-                {active === 0 && (
-                    <Stack gap="lg">
-                        <StepHeader title="Basic Information" desc="Start with the vehicle's core identity details." />
-                        <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
-                            <TextInput label="Make" placeholder="e.g. Toyota" required {...form.getInputProps('make')} />
-                            <TextInput label="Model" placeholder="e.g. Aqua" required {...form.getInputProps('model')} />
-                            <TextInput label="Variant / Trim" placeholder="e.g. G Grade" {...form.getInputProps('variant')} />
-                            <NumberInput label="Year" required min={1900} max={new Date().getFullYear() + 1} {...form.getInputProps('year')} />
-                            <TextInput label="Color Name" placeholder="e.g. Pearl White" required {...form.getInputProps('colorName')} />
-                            <ColorInput label="Color Hex Code" format="hex" {...form.getInputProps('colorHex')} />
-                        </SimpleGrid>
-                        <Divider label="Vehicle Photo" labelPosition="left" />
-                        <FileInput
-                            label="Upload Photo (JPG, PNG, WebP · max 5 MB)"
-                            placeholder="Click to upload..."
-                            accept="image/*"
-                            value={imageFile}
-                            onChange={handleImageChange}
-                            radius="md"
-                        />
-                        {imagePreview && (
-                            <Box style={{ borderRadius: 10, overflow: 'hidden', maxHeight: 200 }}>
-                                <img src={imagePreview} alt="preview" style={{ width: '100%', objectFit: 'cover' }} />
-                            </Box>
-                        )}
-                    </Stack>
-                )}
-
-                {/* ── Step 1: Tech Specs ── */}
-                {active === 1 && (
-                    <Stack gap="lg">
-                        <StepHeader title="Technical Specifications" desc="Enter the vehicle's mechanical and registration details." />
-                        <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
-                            <TextInput label="VIN / Chassis Number" placeholder="e.g. NHP10-1234567" required {...form.getInputProps('vin')} />
-                            <TextInput label="Engine Number" placeholder="e.g. 1NZ-B456789" required {...form.getInputProps('engineNo')} />
-                            <Select
-                                label="Fuel Type" placeholder="Select fuel type" required
-                                data={['Hybrid', 'Electric', 'Plug-in Hybrid', 'Petrol', 'Diesel', 'Mild Hybrid (SHVS)']}
-                                {...form.getInputProps('fuelType')}
-                            />
-                            <TextInput label="Engine Displacement" placeholder="e.g. 1500cc or Electric — 217hp" {...form.getInputProps('displacement')} />
-                            <TextInput label="Transmission" placeholder="e.g. CVT, 7-Speed DCT, Auto" required {...form.getInputProps('transmission')} />
-                            <Select
-                                label="Drive Type" placeholder="Select drive type" required
-                                data={['FWD', 'RWD', 'AWD', '4WD']}
-                                {...form.getInputProps('driveType')}
-                            />
-                            <Select
-                                label="Body Type" placeholder="Select body type" required
-                                data={['Sedan', 'Hatchback', 'SUV', 'Crossover SUV', 'MPV', 'Wagon', 'Van', 'Pickup', 'Kei Car / Mini MPV', 'Coupe', 'Convertible']}
-                                {...form.getInputProps('bodyType')}
-                            />
-                            <NumberInput label="Doors" min={2} max={8} {...form.getInputProps('doors')} />
-                            <NumberInput label="Seats" min={1} max={15} {...form.getInputProps('seats')} />
-                        </SimpleGrid>
-                    </Stack>
-                )}
-
-                {/* ── Step 2: Condition ── */}
-                {active === 2 && (
-                    <Stack gap="lg">
-                        <StepHeader title="Condition & Value" desc="Describe the vehicle's current condition and market value." />
-                        <Box>
-                            <Text fz={12} fw={600} tt="uppercase" lts="0.06em" c="dimmed" mb="sm">Condition Grade *</Text>
-                            <Group gap="sm">
-                                {[1, 2, 3, 4, 5].map((g) => {
-                                    const colors = { 1: '#FF4545', 2: '#FF8C42', 3: '#F5C842', 4: '#00C875', 5: '#4A9EFF' };
-                                    const labels = { 1: 'Poor', 2: 'Below Avg', 3: 'Fair', 4: 'Good', 5: 'Excellent' };
-                                    const selected = form.getValues().condition_grade === g;
-                                    return (
-                                        <Button
-                                            key={g}
-                                            variant={selected ? 'filled' : 'outline'}
-                                            style={{
-                                                borderColor: colors[g],
-                                                background: selected ? colors[g] : 'transparent',
-                                                color: selected ? '#000' : colors[g],
-                                                fontWeight: 700,
-                                                minWidth: 72,
-                                            }}
-                                            onClick={() => form.setFieldValue('condition_grade', g)}
-                                        >
-                                            {g}★ {labels[g]}
-                                        </Button>
-                                    );
-                                })}
-                            </Group>
-                        </Box>
-                        <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
-                            <NumberInput label="Mileage (km)" required min={0} max={1000000} step={1000} {...form.getInputProps('mileage')} />
-                            <NumberInput label="Market Value (LKR)" required min={1} step={100000} {...form.getInputProps('market_value_lkr')} />
-                        </SimpleGrid>
-                    </Stack>
-                )}
-
-                {/* ── Step 3: Badges ── */}
-                {active === 3 && (
-                    <Stack gap="lg">
-                        <StepHeader title="Trust Badges" desc="Toggle the badges this vehicle has earned." />
-                        <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
-                            {[
-                                { key: 'on_time_service', label: 'On-Time Service', desc: 'All services done on schedule' },
-                                { key: 'one_owner', label: 'Single Owner', desc: 'Only one previous owner' },
-                                { key: 'no_accident', label: 'No Accident', desc: 'No recorded accidents' },
-                                { key: 'untampered_mileage', label: 'Mileage Verified', desc: 'Odometer not tampered' },
-                            ].map(({ key, label, desc }) => (
-                                <Paper
-                                    key={key} p="md" radius="md"
-                                    style={{
-                                        border: form.getValues()[key] ? '1px solid rgba(0,200,117,0.3)' : '1px solid rgba(255,255,255,0.07)',
-                                        background: form.getValues()[key] ? 'rgba(0,200,117,0.05)' : '#1A1B1E',
-                                        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                                    }}
-                                >
-                                    <Stack gap={2}>
-                                        <Text fz={14} fw={600} c="white">{label}</Text>
-                                        <Text fz={12} c="dimmed">{desc}</Text>
-                                    </Stack>
-                                    <Switch
-                                        checked={form.getValues()[key]}
-                                        onChange={(e) => form.setFieldValue(key, e.currentTarget.checked)}
-                                        color="brand"
-                                    />
-                                </Paper>
-                            ))}
-                        </SimpleGrid>
-                    </Stack>
-                )}
-
-                {/* ── Step 4: Timeline ── */}
-                {active === 4 && (
-                    <Stack gap="lg">
-                        <Group justify="space-between">
-                            <StepHeader title="Timeline Events" desc="Add key events in the vehicle's history." />
-                            <Button
-                                size="xs" variant="light" color="brand" leftSection={<Plus size={13} />}
-                                onClick={addEvent}
-                            >
-                                Add Event
-                            </Button>
-                        </Group>
-
-                        {timeline.length === 0 && (
-                            <Alert icon={<AlertCircle size={14} />} color="gray" radius="md">
-                                No events yet. Add at least one timeline event.
-                            </Alert>
-                        )}
-
-                        <Stack gap="sm">
-                            {timeline.map((ev, idx) => (
-                                <Paper key={ev.id} radius="lg" style={{ border: '1px solid rgba(255,255,255,0.07)', overflow: 'hidden' }}>
-                                    <Group p="sm" justify="space-between" style={{ background: '#111', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-                                        <Text fz={13} fw={600} c="white">Event {idx + 1} — {ev.phase || 'No phase selected'}</Text>
-                                        <ActionIcon size="sm" variant="subtle" color="red" onClick={() => removeEvent(ev.id)}><Minus size={12} /></ActionIcon>
-                                    </Group>
-                                    <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md" p="md">
-                                        <Select
-                                            label="Phase"
-                                            data={Object.entries(PHASE_COLORS).map(([k, v]) => ({ value: k, label: v.label }))}
-                                            value={ev.phase}
-                                            onChange={(val) => updateEvent(ev.id, 'phase', val)}
-                                            required
-                                        />
-                                        <TextInput label="Source Name" placeholder="e.g. Toyota Motor Corporation"
-                                            value={ev.source} onChange={(e) => updateEvent(ev.id, 'source', e.target.value)} required />
-                                        <TextInput label="Date" type="date"
-                                            value={ev.date} onChange={(e) => updateEvent(ev.id, 'date', e.target.value)} required />
-                                        <TextInput label="Title/Summary" placeholder="e.g. Manufactured at Iwate Plant"
-                                            value={ev.title} onChange={(e) => updateEvent(ev.id, 'title', e.target.value)} required />
-                                        <Box style={{ gridColumn: '1 / -1' }}>
-                                            <Textarea label="Detail" placeholder="Full event description..."
-                                                value={ev.detail} onChange={(e) => updateEvent(ev.id, 'detail', e.target.value)}
-                                                minRows={2} required />
-                                        </Box>
-                                        <Switch label="Verified by official source"
-                                            checked={ev.verified}
-                                            onChange={(e) => updateEvent(ev.id, 'verified', e.currentTarget.checked)}
-                                            color="brand"
-                                        />
+                {/* Content panel */}
+                <Paper radius="xl" p={{ base: 'md', sm: 'xl' }} style={{ border: '1px solid rgba(255,255,255,0.07)', minHeight: 400 }}>
+                    <AnimatePresence mode="wait">
+                        <motion.div
+                            key={active}
+                            initial={{ opacity: 0, x: 20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: -20 }}
+                            transition={{ duration: 0.3 }}
+                        >
+                            {/* ── Step 0: Basic Info ── */}
+                            {active === 0 && (
+                                <Stack gap="lg">
+                                    <StepHeader title="Basic Information" desc="Start with the vehicle's core identity details." />
+                                    <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
+                                        <TextInput label="Make" placeholder="e.g. Toyota" required {...form.getInputProps('make')} />
+                                        <TextInput label="Model" placeholder="e.g. Aqua" required {...form.getInputProps('model')} />
+                                        <TextInput label="Variant / Trim" placeholder="e.g. G Grade" {...form.getInputProps('variant')} />
+                                        <NumberInput label="Year" required min={1900} max={new Date().getFullYear() + 1} {...form.getInputProps('year')} />
+                                        <TextInput label="Color Name" placeholder="e.g. Pearl White" required {...form.getInputProps('colorName')} />
+                                        <ColorInput label="Color Hex Code" format="hex" {...form.getInputProps('colorHex')} />
                                     </SimpleGrid>
-                                </Paper>
-                            ))}
-                        </Stack>
-                    </Stack>
-                )}
-
-                {/* ── Step 5: Review ── */}
-                {active === 5 && (
-                    <Stack gap="xl">
-                        <StepHeader title="Review & Submit" desc="Confirm all details before adding to your fleet." />
-                        {(() => {
-                            const v = form.getValues();
-                            return (
-                                <>
+                                    <Divider label="Vehicle Photo" labelPosition="left" />
+                                    <FileInput
+                                        label="Upload Photo (JPG, PNG, WebP · max 5 MB)"
+                                        placeholder="Click to upload..."
+                                        accept="image/*"
+                                        value={imageFile}
+                                        onChange={handleImageChange}
+                                        radius="md"
+                                    />
                                     {imagePreview && (
-                                        <Box style={{ borderRadius: 12, overflow: 'hidden', maxHeight: 180 }}>
-                                            <img src={imagePreview} alt="Vehicle" style={{ width: '100%', objectFit: 'cover' }} />
+                                        <Box style={{ borderRadius: 10, overflow: 'hidden', maxHeight: 200 }}>
+                                            <img src={imagePreview} alt="preview" style={{ width: '100%', objectFit: 'cover' }} />
                                         </Box>
                                     )}
-                                    <SimpleGrid cols={2} spacing="md">
+                                </Stack>
+                            )}
+
+                            {/* ── Step 1: Tech Specs ── */}
+                            {active === 1 && (
+                                <Stack gap="lg">
+                                    <StepHeader title="Technical Specifications" desc="Enter the vehicle's mechanical and registration details." />
+                                    <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
+                                        <TextInput label="VIN / Chassis Number" placeholder="e.g. NHP10-1234567" required {...form.getInputProps('vin')} />
+                                        <TextInput label="Engine Number" placeholder="e.g. 1NZ-B456789" required {...form.getInputProps('engineNo')} />
+                                        <Select
+                                            label="Fuel Type" placeholder="Select fuel type" required
+                                            data={['Hybrid', 'Electric', 'Plug-in Hybrid', 'Petrol', 'Diesel', 'Mild Hybrid (SHVS)']}
+                                            {...form.getInputProps('fuelType')}
+                                        />
+                                        <TextInput label="Engine Displacement" placeholder="e.g. 1500cc or Electric — 217hp" {...form.getInputProps('displacement')} />
+                                        <TextInput label="Transmission" placeholder="e.g. CVT, 7-Speed DCT, Auto" required {...form.getInputProps('transmission')} />
+                                        <Select
+                                            label="Drive Type" placeholder="Select drive type" required
+                                            data={['FWD', 'RWD', 'AWD', '4WD']}
+                                            {...form.getInputProps('driveType')}
+                                        />
+                                        <Select
+                                            label="Body Type" placeholder="Select body type" required
+                                            data={['Sedan', 'Hatchback', 'SUV', 'Crossover SUV', 'MPV', 'Wagon', 'Van', 'Pickup', 'Kei Car / Mini MPV', 'Coupe', 'Convertible']}
+                                            {...form.getInputProps('bodyType')}
+                                        />
+                                        <NumberInput label="Doors" min={2} max={8} {...form.getInputProps('doors')} />
+                                        <NumberInput label="Seats" min={1} max={15} {...form.getInputProps('seats')} />
+                                    </SimpleGrid>
+                                </Stack>
+                            )}
+
+                            {/* ── Step 2: Condition ── */}
+                            {active === 2 && (
+                                <Stack gap="lg">
+                                    <StepHeader title="Condition & Value" desc="Describe the vehicle's current condition and market value." />
+                                    <Box>
+                                        <Text fz={12} fw={600} tt="uppercase" lts="0.06em" c="dimmed" mb="sm">Condition Grade *</Text>
+                                        <Group gap="sm">
+                                            {[1, 2, 3, 4, 5].map((g) => {
+                                                const colors = { 1: '#FF4545', 2: '#FF8C42', 3: '#F5C842', 4: '#00C875', 5: '#4A9EFF' };
+                                                const labels = { 1: 'Poor', 2: 'Below Avg', 3: 'Fair', 4: 'Good', 5: 'Excellent' };
+                                                const selected = form.getValues().condition_grade === g;
+                                                return (
+                                                    <Button
+                                                        key={g}
+                                                        variant={selected ? 'filled' : 'outline'}
+                                                        style={{
+                                                            borderColor: colors[g],
+                                                            background: selected ? colors[g] : 'transparent',
+                                                            color: selected ? '#000' : colors[g],
+                                                            fontWeight: 700,
+                                                            minWidth: 72,
+                                                        }}
+                                                        onClick={() => form.setFieldValue('condition_grade', g)}
+                                                    >
+                                                        {g}★ {labels[g]}
+                                                    </Button>
+                                                );
+                                            })}
+                                        </Group>
+                                    </Box>
+                                    <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
+                                        <NumberInput label="Mileage (km)" required min={0} max={1000000} step={1000} {...form.getInputProps('mileage')} />
+                                        <NumberInput label="Market Value (LKR)" required min={1} step={100000} {...form.getInputProps('market_value_lkr')} />
+                                    </SimpleGrid>
+                                </Stack>
+                            )}
+
+                            {/* ── Step 3: Badges ── */}
+                            {active === 3 && (
+                                <Stack gap="lg">
+                                    <StepHeader title="Trust Badges" desc="Toggle the badges this vehicle has earned." />
+                                    <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
                                         {[
-                                            ['Make', v.make], ['Model', v.model], ['Year', v.year],
-                                            ['Color', v.colorName], ['Fuel Type', v.fuelType], ['Transmission', v.transmission],
-                                            ['Drive Type', v.driveType], ['Body Type', v.bodyType],
-                                            ['Mileage', `${Number(v.mileage).toLocaleString()} km`],
-                                            ['Market Value', `LKR ${Number(v.market_value_lkr).toLocaleString()}`],
-                                            ['Condition Grade', `${v.condition_grade}/5`],
-                                        ].map(([label, val]) => (
-                                            <Box key={label}>
-                                                <Text fz={10} c="dimmed" tt="uppercase" lts="0.06em">{label}</Text>
-                                                <Text fz={14} fw={500} c="white">{val || '—'}</Text>
-                                            </Box>
+                                            { key: 'on_time_service', label: 'On-Time Service', desc: 'All services done on schedule' },
+                                            { key: 'one_owner', label: 'Single Owner', desc: 'Only one previous owner' },
+                                            { key: 'no_accident', label: 'No Accident', desc: 'No recorded accidents' },
+                                            { key: 'untampered_mileage', label: 'Mileage Verified', desc: 'Odometer not tampered' },
+                                        ].map(({ key, label, desc }) => (
+                                            <Paper
+                                                key={key} p="md" radius="md"
+                                                style={{
+                                                    border: form.getValues()[key] ? '1px solid rgba(0,200,117,0.3)' : '1px solid rgba(255,255,255,0.07)',
+                                                    background: form.getValues()[key] ? 'rgba(0,200,117,0.05)' : '#1A1B1E',
+                                                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                                                }}
+                                            >
+                                                <Stack gap={2}>
+                                                    <Text fz={14} fw={600} c="white">{label}</Text>
+                                                    <Text fz={12} c="dimmed">{desc}</Text>
+                                                </Stack>
+                                                <Switch
+                                                    checked={form.getValues()[key]}
+                                                    onChange={(e) => form.setFieldValue(key, e.currentTarget.checked)}
+                                                    color="brand"
+                                                />
+                                            </Paper>
                                         ))}
                                     </SimpleGrid>
-                                    <Divider />
-                                    <Text fz={13} c="dimmed">{timeline.length} timeline event(s) added</Text>
-                                    <Group gap="xs">
-                                        {[['on_time_service', 'On-Time Service'], ['one_owner', 'One Owner'],
-                                        ['no_accident', 'No Accident'], ['untampered_mileage', 'Mileage Verified']].map(([key, label]) => (
-                                            <Badge key={key} variant={v[key] ? 'filled' : 'outline'} color={v[key] ? 'brand' : 'gray'} size="sm">
-                                                {label}
-                                            </Badge>
-                                        ))}
-                                    </Group>
-                                </>
-                            );
-                        })()}
-                    </Stack>
-                )}
-            </Paper>
+                                </Stack>
+                            )}
 
-            {/* Navigation */}
-            <Group justify="space-between" mt="xl">
-                <Button
-                    variant="outline" color="gray" radius="md"
-                    leftSection={<ChevronLeft size={14} />}
-                    onClick={prevStep}
-                    disabled={active === 0}
-                >
-                    Back
-                </Button>
-                <Text fz={13} c="dimmed">Step {active + 1} of {STEPS.length}</Text>
-                {active < STEPS.length - 1 ? (
+                            {/* ── Step 4: Timeline ── */}
+                            {active === 4 && (
+                                <Stack gap="lg">
+                                    <Group justify="space-between">
+                                        <StepHeader title="Timeline Events" desc="Add key events in the vehicle's history." />
+                                        <Button
+                                            size="xs" variant="light" color="brand" leftSection={<Plus size={13} />}
+                                            onClick={addEvent}
+                                        >
+                                            Add Event
+                                        </Button>
+                                    </Group>
+
+                                    {timeline.length === 0 && (
+                                        <Alert icon={<AlertCircle size={14} />} color="gray" radius="md">
+                                            No events yet. Add at least one timeline event.
+                                        </Alert>
+                                    )}
+
+                                    <Stack gap="sm">
+                                        {timeline.map((ev, idx) => (
+                                            <Paper key={ev.id} radius="lg" style={{ border: '1px solid rgba(255,255,255,0.07)', overflow: 'hidden' }}>
+                                                <Group p="sm" justify="space-between" style={{ background: '#111', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                                                    <Text fz={13} fw={600} c="white">Event {idx + 1} — {ev.phase || 'No phase selected'}</Text>
+                                                    <ActionIcon size="sm" variant="subtle" color="red" onClick={() => removeEvent(ev.id)}><Minus size={12} /></ActionIcon>
+                                                </Group>
+                                                <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md" p="md">
+                                                    <Select
+                                                        label="Phase"
+                                                        data={Object.entries(PHASE_COLORS).map(([k, v]) => ({ value: k, label: v.label }))}
+                                                        value={ev.phase}
+                                                        onChange={(val) => updateEvent(ev.id, 'phase', val)}
+                                                        required
+                                                    />
+                                                    <TextInput label="Source Name" placeholder="e.g. Toyota Motor Corporation"
+                                                        value={ev.source} onChange={(e) => updateEvent(ev.id, 'source', e.target.value)} required />
+                                                    <TextInput label="Date" type="date"
+                                                        value={ev.date} onChange={(e) => updateEvent(ev.id, 'date', e.target.value)} required />
+                                                    <TextInput label="Title/Summary" placeholder="e.g. Manufactured at Iwate Plant"
+                                                        value={ev.title} onChange={(e) => updateEvent(ev.id, 'title', e.target.value)} required />
+                                                    <Box style={{ gridColumn: '1 / -1' }}>
+                                                        <Textarea label="Detail" placeholder="Full event description..."
+                                                            value={ev.detail} onChange={(e) => updateEvent(ev.id, 'detail', e.target.value)}
+                                                            minRows={2} required />
+                                                    </Box>
+                                                    <Switch label="Verified by official source"
+                                                        checked={ev.verified}
+                                                        onChange={(e) => updateEvent(ev.id, 'verified', e.currentTarget.checked)}
+                                                        color="brand"
+                                                    />
+                                                </SimpleGrid>
+                                            </Paper>
+                                        ))}
+                                    </Stack>
+                                </Stack>
+                            )}
+
+                            {/* ── Step 5: Review ── */}
+                            {active === 5 && (
+                                <Stack gap="xl">
+                                    <StepHeader title="Review & Submit" desc="Confirm all details before adding to your fleet." />
+                                    {(() => {
+                                        const v = form.getValues();
+                                        return (
+                                            <>
+                                                {imagePreview && (
+                                                    <Box style={{ borderRadius: 12, overflow: 'hidden', maxHeight: 180 }}>
+                                                        <img src={imagePreview} alt="Vehicle" style={{ width: '100%', objectFit: 'cover' }} />
+                                                    </Box>
+                                                )}
+                                                <SimpleGrid cols={2} spacing="md">
+                                                    {[
+                                                        ['Make', v.make], ['Model', v.model], ['Year', v.year],
+                                                        ['Color', v.colorName], ['Fuel Type', v.fuelType], ['Transmission', v.transmission],
+                                                        ['Drive Type', v.driveType], ['Body Type', v.bodyType],
+                                                        ['Mileage', `${Number(v.mileage).toLocaleString()} km`],
+                                                        ['Market Value', `LKR ${Number(v.market_value_lkr).toLocaleString()}`],
+                                                        ['Condition Grade', `${v.condition_grade}/5`],
+                                                    ].map(([label, val]) => (
+                                                        <Box key={label}>
+                                                            <Text fz={10} c="dimmed" tt="uppercase" lts="0.06em">{label}</Text>
+                                                            <Text fz={14} fw={500} c="white">{val || '—'}</Text>
+                                                        </Box>
+                                                    ))}
+                                                </SimpleGrid>
+                                                <Divider />
+                                                <Text fz={13} c="dimmed">{timeline.length} timeline event(s) added</Text>
+                                                <Group gap="xs">
+                                                    {[['on_time_service', 'On-Time Service'], ['one_owner', 'One Owner'],
+                                                    ['no_accident', 'No Accident'], ['untampered_mileage', 'Mileage Verified']].map(([key, label]) => (
+                                                        <Badge key={key} variant={v[key] ? 'filled' : 'outline'} color={v[key] ? 'brand' : 'gray'} size="sm">
+                                                            {label}
+                                                        </Badge>
+                                                    ))}
+                                                </Group>
+                                            </>
+                                        );
+                                    })()}
+                                </Stack>
+                            )}
+                        </motion.div>
+                    </AnimatePresence>
+                </Paper>
+
+                {/* Navigation */}
+                <Group justify="space-between" mt="xl">
                     <Button
-                        color="brand" radius="md" fw={700}
-                        rightSection={<ChevronRight size={14} />}
-                        onClick={nextStep}
+                        variant="outline" color="gray" radius="md"
+                        leftSection={<ChevronLeft size={14} />}
+                        onClick={prevStep}
+                        disabled={active === 0}
                     >
-                        Continue
+                        Back
                     </Button>
-                ) : (
-                    <Button
-                        color="brand" radius="md" fw={700} size="md"
-                        leftSection={<Send size={14} />}
-                        onClick={handleSubmit}
-                        loading={submitting}
-                    >
-                        Add to Fleet
-                    </Button>
-                )}
-            </Group>
-        </Container>
+                    <Text fz={13} c="dimmed">Step {active + 1} of {STEPS.length}</Text>
+                    {active < STEPS.length - 1 ? (
+                        <Button
+                            color="brand" radius="md" fw={700}
+                            rightSection={<ChevronRight size={14} />}
+                            onClick={nextStep}
+                        >
+                            Continue
+                        </Button>
+                    ) : (
+                        <Button
+                            color="brand" radius="md" fw={700} size="md"
+                            leftSection={<Send size={14} />}
+                            onClick={handleSubmit}
+                            loading={submitting}
+                        >
+                            Add to Fleet
+                        </Button>
+                    )}
+                </Group>
+            </Container>
+        </motion.div>
     );
 }
 

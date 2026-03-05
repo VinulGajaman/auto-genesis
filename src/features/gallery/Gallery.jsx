@@ -9,6 +9,7 @@ import {
     Check, BookOpen, ArrowUpDown,
     Wrench, User, ShieldCheck, Gauge
 } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { useAppStore } from '../../store/useAppStore';
 import { useVehicleStore } from '../../store/useVehicleStore';
 import { GRADE_COLORS } from '../../data/phaseColors';
@@ -67,7 +68,13 @@ export default function Gallery() {
                 <div className="hero-grid-bg" style={{ zIndex: 1 }} />
                 <div className="hero-glow-orb hero-orb-1" style={{ zIndex: 1 }} />
                 <div className="hero-glow-orb hero-orb-2" style={{ zIndex: 1 }} />
-                <div className="hero-content" style={{ zIndex: 2 }}>
+                <motion.div
+                    className="hero-content"
+                    style={{ zIndex: 2 }}
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.8, ease: "easeOut" }}
+                >
                     <h1 className="hero-title">
                         Transparent Vehicle<br />
                         <span className="hero-title-accent">History &amp; Trust</span>
@@ -90,7 +97,7 @@ export default function Gallery() {
                             Compare Vehicles
                         </Button>
                     </Group>
-                </div>
+                </motion.div>
             </section>
 
             {/* ── Stats bar ── */}
@@ -177,19 +184,38 @@ export default function Gallery() {
                             <Text fz={13} c="dimmed">Try adjusting your search or filters</Text>
                         </Paper>
                     ) : (
-                        <SimpleGrid cols={{ base: 1, sm: 2, md: 3, lg: 3 }} spacing="lg">
-                            {filtered.map((v, i) => (
-                                <VehicleCard
-                                    key={v.id}
-                                    vehicle={v}
-                                    index={i}
-                                    isComparing={compareList.includes(v.id)}
-                                    onCompareToggle={handleCompareToggle}
-                                    onViewPassport={() => navigate(`/passport/${v.id}`)}
-                                    onSwap={() => navigate(`/swap/${v.id}`)}
-                                />
-                            ))}
-                        </SimpleGrid>
+                        <motion.div
+                            initial="hidden"
+                            animate="visible"
+                            variants={{
+                                visible: {
+                                    transition: {
+                                        staggerChildren: 0.1
+                                    }
+                                }
+                            }}
+                        >
+                            <SimpleGrid cols={{ base: 1, sm: 2, md: 3, lg: 3 }} spacing="lg">
+                                {filtered.map((v, i) => (
+                                    <motion.div
+                                        key={v.id}
+                                        variants={{
+                                            hidden: { opacity: 0, y: 20 },
+                                            visible: { opacity: 1, y: 0, transition: { duration: 0.5 } }
+                                        }}
+                                    >
+                                        <VehicleCard
+                                            vehicle={v}
+                                            index={i}
+                                            isComparing={compareList.includes(v.id)}
+                                            onCompareToggle={handleCompareToggle}
+                                            onViewPassport={() => navigate(`/passport/${v.id}`)}
+                                            onSwap={() => navigate(`/swap/${v.id}`)}
+                                        />
+                                    </motion.div>
+                                ))}
+                            </SimpleGrid>
+                        </motion.div>
                     )}
                 </Container>
             </section>

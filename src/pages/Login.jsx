@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Box, Container, Paper, Text, TextInput, PasswordInput, Button, Group, Stack } from '@mantine/core';
 import { AlertCircle, ArrowRight } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { useAuthStore } from '../store/useAuthStore';
 import { useAppStore } from '../store/useAppStore';
 
@@ -64,77 +65,79 @@ export default function Login() {
             }} />
 
             <Container size={420} style={{ position: 'relative', zIndex: 1 }}>
-                <Paper
-                    radius="xl"
-                    p="xl"
-                    withBorder
-                    style={{
-                        background: 'rgba(13, 17, 23, 0.7)',
-                        backdropFilter: 'blur(20px)',
-                        borderColor: 'rgba(255,255,255,0.08)',
-                        boxShadow: '0 24px 64px rgba(0,0,0,0.5)'
-                    }}
-                >
-                    <Stack align="center" ta="center" mb="xl">
-                        <Group gap={8}>
-                            <img src="/favicon.svg" alt="AutoGenesis" style={{ height: 32 }} />
-                            <Text ff="var(--font-display)" fz={28} c="white" lts="0.05em">
-                                AUTO<span style={{ color: '#3b82f6' }}>GENESIS</span>
+                <motion.div initial={{ opacity: 0, scale: 0.95, y: 10 }} animate={{ opacity: 1, scale: 1, y: 0 }} transition={{ duration: 0.4 }}>
+                    <Paper
+                        radius="xl"
+                        p="xl"
+                        withBorder
+                        style={{
+                            background: 'rgba(13, 17, 23, 0.7)',
+                            backdropFilter: 'blur(20px)',
+                            borderColor: 'rgba(255,255,255,0.08)',
+                            boxShadow: '0 24px 64px rgba(0,0,0,0.5)'
+                        }}
+                    >
+                        <Stack align="center" ta="center" mb="xl">
+                            <Group gap={8}>
+                                <img src="/favicon.svg" alt="AutoGenesis" style={{ height: 32 }} />
+                                <Text ff="var(--font-display)" fz={28} c="white" lts="0.05em">
+                                    AUTO<span style={{ color: '#3b82f6' }}>GENESIS</span>
+                                </Text>
+                            </Group>
+                            <Text c="dimmed" fz="sm" mt={-4}>
+                                Sign in to access fleet management tools.
                             </Text>
-                        </Group>
-                        <Text c="dimmed" fz="sm" mt={-4}>
-                            Sign in to access fleet management tools.
-                        </Text>
-                    </Stack>
-
-                    <form onSubmit={handleLogin}>
-                        <Stack gap="md">
-                            <TextInput
-                                label="Username"
-                                placeholder="Enter your username"
-                                value={username}
-                                onChange={(e) => setUsername(e.currentTarget.value)}
-                                radius="md"
-                                size="md"
-                                required
-                            />
-                            <PasswordInput
-                                label="Password"
-                                placeholder="Your password"
-                                value={password}
-                                onChange={(e) => setPassword(e.currentTarget.value)}
-                                radius="md"
-                                size="md"
-                                required
-                            />
-
-                            {error && (
-                                <Group gap={8} style={{ color: 'var(--red)' }} mt="-xs">
-                                    <AlertCircle size={14} />
-                                    <Text fz="sm">{error}</Text>
-                                </Group>
-                            )}
-
-                            <Text fz="xs" c="dimmed" ta="center" mt="xs">
-                                For this demo, use: <b>admin</b> / <b>admin123</b>
-                            </Text>
-
-                            <Button
-                                type="submit"
-                                fullWidth
-                                mt="md"
-                                size="lg"
-                                radius="xl"
-                                color="brand"
-                                loading={loading}
-                                rightSection={!loading && <ArrowRight size={18} />}
-                                style={{ boxShadow: '0 4px 20px rgba(59, 130, 246, 0.4)' }}
-                            >
-                                Login
-                            </Button>
                         </Stack>
-                    </form>
-                </Paper>
+
+                        <form onSubmit={handleLogin}>
+                            <Stack gap="md">
+                                <TextInput
+                                    label="Username"
+                                    placeholder="Enter your username"
+                                    value={username}
+                                    onChange={(e) => setUsername(e.currentTarget.value)}
+                                    radius="md"
+                                    size="md"
+                                    required
+                                />
+                                <PasswordInput
+                                    label="Password"
+                                    placeholder="Your password"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.currentTarget.value)}
+                                    radius="md"
+                                    size="md"
+                                    required
+                                />
+
+                                {error && (
+                                    <Group gap={8} style={{ color: 'var(--red)' }} mt="-xs">
+                                        <AlertCircle size={14} />
+                                        <Text fz="sm">{error}</Text>
+                                    </Group>
+                                )}
+
+                                <Text fz="xs" c="dimmed" ta="center" mt="xs">
+                                    For this demo, use: <b>admin</b> / <b>admin123</b>
+                                </Text>
+
+                                <Button
+                                    type="submit"
+                                    fullWidth
+                                    mt="md"
+                                    size="lg"
+                                    radius="xl"
+                                    color="brand"
+                                    loading={loading}
+                                    rightSection={!loading && <ArrowRight size={18} />}
+                                    style={{ boxShadow: '0 4px 20px rgba(59, 130, 246, 0.4)' }}
+                                >
+                                    Login
+                                </Button>
+                            </Stack>
+                        </form>
+                    </Paper>
+                </motion.div>
             </Container>
         </Box>
     );

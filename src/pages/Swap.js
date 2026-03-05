@@ -4,6 +4,7 @@ import VEHICLES from '../data/vehicles';
 
 import { getVehicleById, formatLKR, formatKm, swapDelta } from '../utils/helpers';
 import { useApp } from '../context/AppContext';
+import { motion } from 'framer-motion';
 import '../styles/Swap.css';
 
 export default function Swap() {
@@ -23,7 +24,7 @@ export default function Swap() {
   const options = VEHICLES.filter(v => v.id !== source.id);
 
   return (
-    <div className="page">
+    <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="page">
       <div className="swap-header">
         <button className="back-btn" onClick={() => navigate('/')}>← Back to Gallery</button>
         <h1 className="section-title">Vehicle Swap</h1>
@@ -83,7 +84,7 @@ export default function Swap() {
       {modalTarget && (
         <SwapModal source={source} target={modalTarget} onClose={() => setModalTarget(null)} showToast={showToast} />
       )}
-    </div>
+    </motion.div>
   );
 }
 

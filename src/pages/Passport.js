@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
-  Container, Box, Group, Stack, Text, Button, Paper, SimpleGrid,
+  Container, Box, Group, Stack, Text, Button, Paper, SimpleGrid, Grid,
   Badge, Tabs, Tooltip, ActionIcon,
   Select,
 } from '@mantine/core';
@@ -11,6 +11,7 @@ import {
   MapPin, Ship, Building2, Flag, Calendar, Milestone, ChevronDown,
   Activity, Clock, Zap, TrendingDown,
 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Line } from 'react-chartjs-2';
 import {
   Chart as ChartJS, CategoryScale, LinearScale, PointElement,
@@ -40,6 +41,7 @@ export default function Passport() {
   const vehicle = getVehicleById(id);
   const addToCompare = useAppStore((s) => s.addToCompare);
   const showToast = useAppStore((s) => s.showToast);
+  const [activeTab, setActiveTab] = useState('timeline');
 
   React.useEffect(() => { window.scrollTo(0, 0); }, [id]);
 
@@ -62,96 +64,146 @@ export default function Passport() {
       <Box
         className="passport-hero"
         style={{
-          backgroundImage: vehicle.image ? `url(${vehicle.image})` : undefined,
-          backgroundColor: vehicle.thumbnailColor || '#1a1f2e',
+          position: 'relative',
+          paddingTop: 80,
+          paddingBottom: 40,
+          background: 'radial-gradient(circle at 70% 30%, rgba(59, 130, 246, 0.15), transparent 60%)',
         }}
       >
-        <div className="passport-hero-overlay" />
-
-        {/* Back button */}
-        <Button
-          variant="subtle" color="gray" size="sm"
-          leftSection={<ArrowLeft size={14} />}
-          onClick={() => navigate('/')}
-          style={{ position: 'absolute', top: 20, left: 20, zIndex: 10 }}
-        >
-          Back
-        </Button>
-
-        {/* Verified badge top-right */}
-        <Box
-          style={{
-            position: 'absolute',
-            top: 24,
-            right: 24,
-            zIndex: 10,
-            display: 'flex',
-            alignItems: 'center',
-            gap: 8,
-            background: 'rgba(17, 24, 39, 0.6)',
-            backdropFilter: 'blur(8px)',
-            border: '1px solid rgba(59, 130, 246, 0.4)',
-            padding: '6px 14px',
-            borderRadius: 999,
-            boxShadow: '0 4px 20px rgba(0,0,0,0.5), inset 0 0 12px rgba(59,130,246,0.1)',
-          }}
-        >
-          <Box
-            style={{
-              width: 20, height: 20, borderRadius: '50%', background: '#3b82f6',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              boxShadow: '0 0 10px rgba(59,130,246,0.8)'
-            }}
+        <Container size="xl">
+          <Button
+            variant="subtle" color="gray" size="sm"
+            leftSection={<ArrowLeft size={14} />}
+            onClick={() => navigate('/')}
+            mb="xl"
           >
-            <Check size={12} strokeWidth={4} color="#080c12" />
-          </Box>
-          <Text ff="var(--font-display)" fz={13} fw={600} lts="0.08em" style={{ color: '#fff', lineHeight: 1 }}>
-            AUTOGENESIS <span style={{ color: '#60a5fa' }}>VERIFIED</span>
-          </Text>
-        </Box>
+            Back
+          </Button>
 
-        {/* Hero content */}
-        <Box className="passport-hero-content">
-          {/* <Badge
-            leftSection={<Sparkles size={10} />}
-            variant="outline"
-            color="brand"
-            size="sm"
-            mb="md"
-            style={{ letterSpacing: '0.07em', fontWeight: 700, border: '1px solid rgba(59,130,246,0.4)' }}
-          >
-            AutoGenesis Passport
-          </Badge> */}
-
-          <Text
-            ff="var(--font-display)"
-            fz={{ base: 42, sm: 64, md: 80 }}
-            lts="0.04em"
-            c="white"
-            lh={1}
-          >
-            {vehicle.make.toUpperCase()} {vehicle.model.toUpperCase()}
-          </Text>
-
-          <Text c="rgba(255,255,255,0.65)" fz={16} mt={8}>
-            {vehicle.variant} · {vehicle.year} · {vehicle.color}
-          </Text>
-
-          <Group gap="sm" mt="md" wrap="wrap">
-            {plate && (
-              <Badge
-                variant="filled"
-                style={{ background: 'rgba(59,130,246,0.15)', border: '1px solid rgba(59,130,246,0.4)', color: '#60a5fa', fontFamily: 'monospace', letterSpacing: '0.1em', fontSize: 13 }}
-                size="lg"
+          <Grid gutter={{ base: 60, md: 50 }} align="center">
+            {/* ── Left: Creative Image Composition ── */}
+            <Grid.Col span={{ base: 12, md: 5 }}>
+              <motion.div
+                initial={{ opacity: 0, x: -30 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.8, ease: "easeOut" }}
+                style={{ position: 'relative' }}
               >
-                {plate}
-              </Badge>
-            )}
-            <Badge variant="dot" color="gray" size="sm" style={{ fontFamily: 'var(--font-body)' }}>
-              VIN: {vehicle.vin}
-            </Badge>
-          </Group>
-        </Box>
+                <Box
+                  style={{
+                    borderRadius: 24,
+                    overflow: 'hidden',
+                    position: 'relative',
+                    boxShadow: `0 30px 60px rgba(0,0,0,0.6), 0 0 0 1px ${vehicle.thumbnailColor || 'rgba(255,255,255,0.1)'}`,
+                    aspectRatio: '16/10',
+                    backgroundColor: vehicle.thumbnailColor || '#1a1f2e',
+                  }}
+                >
+                  {/* Embedded Verified Badge (Top Right) */}
+                  <Box
+                    style={{
+                      position: 'absolute', top: 16, right: 16, zIndex: 10,
+                      display: 'flex', alignItems: 'center', gap: 6,
+                      background: 'rgba(17, 24, 39, 0.7)', backdropFilter: 'blur(12px)',
+                      border: '1px solid rgba(59, 130, 246, 0.4)',
+                      padding: '6px 14px', borderRadius: 999,
+                      boxShadow: '0 4px 20px rgba(0,0,0,0.5)',
+                    }}
+                  >
+                    <Box
+                      style={{
+                        width: 16, height: 16, borderRadius: '50%', background: '#3b82f6',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      }}
+                    >
+                      <Check size={10} strokeWidth={4} color="#080c12" />
+                    </Box>
+                    <Text ff="var(--font-display)" fz={11} fw={700} lts="0.08em" style={{ color: '#fff', lineHeight: 1 }}>
+                      AUTOGENESIS <span style={{ color: '#60a5fa' }}>VERIFIED</span>
+                    </Text>
+                  </Box>
+
+                  <Box style={{ position: 'absolute', inset: 0, zIndex: 1, background: 'linear-gradient(to top, rgba(0,0,0,0.4), transparent)' }} />
+                  {vehicle.image && (
+                    <img
+                      src={vehicle.image}
+                      alt={`${vehicle.make} ${vehicle.model}`}
+                      style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                    />
+                  )}
+                </Box>
+
+                {/* Overlapping Glass Stats Card */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.4 }}
+                  style={{
+                    position: 'absolute',
+                    bottom: -20,
+                    left: '10%',
+                    right: '10%',
+                    background: 'rgba(17, 24, 39, 0.85)',
+                    backdropFilter: 'blur(20px)',
+                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    borderRadius: 16,
+                    padding: '12px 20px',
+                    boxShadow: '0 10px 30px rgba(0,0,0,0.5)',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    zIndex: 2,
+                  }}
+                >
+                  <Box>
+                    <Text fz={10} c="dimmed" tt="uppercase" fw={600} lts="0.1em">VIN / Chassis</Text>
+                    <Text fz={13} fw={500} c="white" style={{ fontFamily: 'monospace' }}>{vehicle.vin}</Text>
+                  </Box>
+                  {plate && (
+                    <Box style={{ textAlign: 'right' }}>
+                      <Text fz={10} c="dimmed" tt="uppercase" fw={600} lts="0.1em">Plate Number</Text>
+                      <Badge variant="filled" size="sm" style={{ background: 'rgba(59,130,246,0.15)', color: '#60a5fa', fontFamily: 'monospace', letterSpacing: '0.1em' }}>
+                        {plate}
+                      </Badge>
+                    </Box>
+                  )}
+                </motion.div>
+              </motion.div>
+            </Grid.Col>
+
+            {/* ── Right: Typography & Details ── */}
+            <Grid.Col span={{ base: 12, md: 7 }}>
+              <Stack gap="md">
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.2 }}
+                >
+                  <Text
+                    ff="var(--font-display)"
+                    fz={{ base: 46, sm: 64, md: 80 }}
+                    lts="0.02em"
+                    c="white"
+                    lh={1}
+                  >
+                    {vehicle.make.toUpperCase()}{' '}
+                    <span style={{ color: '#60a5fa' }}>{vehicle.model.toUpperCase()}</span>
+                  </Text>
+                </motion.div>
+
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.6, delay: 0.4 }}
+                >
+                  <Text c="rgba(255,255,255,0.7)" fz={20} fw={500}>
+                    {vehicle.variant} · {vehicle.year} · {vehicle.color}
+                  </Text>
+                </motion.div>
+              </Stack>
+            </Grid.Col>
+          </Grid>
+        </Container>
       </Box>
 
       {/* ════ QUICK STATS STRIP ════ */}
@@ -205,31 +257,35 @@ export default function Passport() {
           {/* Trust badges */}
           <Paper radius="xl" p="xl" style={{ background: '#0d1117', border: '1px solid rgba(255,255,255,0.07)' }}>
             <Text fz={11} c="dimmed" tt="uppercase" lts="0.1em" mb="md" fw={600}>Trust Badges</Text>
-            <SimpleGrid cols={2} spacing="sm">
+            <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
               {[
-                { key: 'on_time_service', label: 'On-Time Service', desc: 'All services done on schedule', icon: <Wrench size={16} /> },
-                { key: 'one_owner', label: 'One Owner', desc: 'Single ownership history', icon: <User size={16} /> },
-                { key: 'no_accident', label: 'No Accident', desc: 'No recorded accidents', icon: <ShieldCheck size={16} /> },
-                { key: 'untampered_mileage', label: 'Mileage Verified', desc: 'Odometer not tampered', icon: <Gauge size={16} /> },
+                { key: 'on_time_service', label: 'On-Time Service', desc: 'All services done on schedule', icon: <Wrench size={22} /> },
+                { key: 'one_owner', label: 'One Owner', desc: 'Single ownership history', icon: <User size={22} /> },
+                { key: 'no_accident', label: 'No Accident', desc: 'No recorded accidents', icon: <ShieldCheck size={22} /> },
+                { key: 'untampered_mileage', label: 'Mileage Verified', desc: 'Odometer not tampered', icon: <Gauge size={22} /> },
               ].map(({ key, label, desc, icon }) => {
                 const earned = vehicle.badges?.[key];
                 return (
                   <Paper
-                    key={key} radius="lg" p="sm"
+                    key={key} radius="xl" p="md"
                     style={{
-                      border: earned ? '1px solid rgba(59,130,246,0.3)' : '1px solid rgba(255,255,255,0.06)',
-                      background: earned ? 'rgba(59,130,246,0.06)' : 'rgba(255,255,255,0.02)',
+                      border: earned ? '1px solid rgba(59,130,246,0.4)' : '1px solid rgba(255,255,255,0.06)',
+                      background: earned ? 'rgba(59,130,246,0.08)' : 'rgba(255,255,255,0.02)',
                       opacity: earned ? 1 : 0.45,
                       position: 'relative',
                     }}
                   >
-                    <Box style={{ color: earned ? '#3b82f6' : 'var(--text-muted)' }} mb={6}>{icon}</Box>
-                    <Text fz={13} fw={600} c={earned ? 'white' : 'dimmed'}>{label}</Text>
-                    <Text fz={11} c="dimmed" lh={1.4}>{desc}</Text>
-                    <Box style={{ position: 'absolute', top: 10, right: 10 }}>
+                    <Group gap="sm" align="center" wrap="nowrap">
+                      <Box style={{ color: earned ? '#3b82f6' : 'var(--text-muted)' }}>{icon}</Box>
+                      <Box style={{ minWidth: 0 }}>
+                        <Text fz={15} fw={700} c={earned ? 'white' : 'dimmed'}>{label}</Text>
+                        <Text fz={13} c="dimmed" lh={1.4}>{desc}</Text>
+                      </Box>
+                    </Group>
+                    <Box style={{ position: 'absolute', top: 16, right: 16 }}>
                       {earned
-                        ? <CheckCircle2 size={16} color="#3b82f6" />
-                        : <XCircle size={14} color="#64748b" />}
+                        ? <CheckCircle2 size={18} color="#3b82f6" />
+                        : <XCircle size={18} color="#64748b" />}
                     </Box>
                   </Paper>
                 );
@@ -281,30 +337,73 @@ export default function Passport() {
 
         {/* ── Tabbed History ── */}
         <Paper radius="xl" mb="xl" style={{ background: '#0d1117', border: '1px solid rgba(255,255,255,0.07)', overflow: 'hidden' }}>
-          <Tabs defaultValue="timeline" color="brand">
-            <Tabs.List
+          <Tabs value={activeTab} onChange={setActiveTab} color="brand" keepMounted={false}>
+            {/* Custom Animated Tab List */}
+            <Box
               style={{
-                padding: '8px 16px',
-                borderBottom: '1px solid rgba(255,255,255,0.06)',
+                padding: '12px 16px',
+                borderBottom: '1px solid rgba(255,255,255,0.04)',
+                background: 'rgba(255,255,255,0.01)',
+                display: 'flex',
+                gap: 8,
                 overflowX: 'auto',
-                flexWrap: 'nowrap',
                 scrollbarWidth: 'none',
-                gap: 4
               }}
             >
-              <Tabs.Tab value="timeline" leftSection={<Activity size={13} />} style={{ whiteSpace: 'nowrap' }}>Full Timeline</Tabs.Tab>
-              <Tabs.Tab value="service" leftSection={<Wrench size={13} />} style={{ whiteSpace: 'nowrap' }}>Service</Tabs.Tab>
-              <Tabs.Tab value="ownership" leftSection={<User size={13} />} style={{ whiteSpace: 'nowrap' }}>Ownership</Tabs.Tab>
-              <Tabs.Tab value="travel" leftSection={<Ship size={13} />} style={{ whiteSpace: 'nowrap' }}>Travel</Tabs.Tab>
-              <Tabs.Tab value="accident" leftSection={<AlertTriangle size={13} />} style={{ whiteSpace: 'nowrap' }}>
-                <Group gap={6} align="center" wrap="nowrap">
-                  <span>Accident</span>
-                  {accidentCount > 0 && <Badge size="xs" color="red" variant="filled" circle>{accidentCount}</Badge>}
-                </Group>
-              </Tabs.Tab>
-            </Tabs.List>
+              {[
+                { id: 'timeline', label: 'Full Timeline', icon: <Activity size={14} /> },
+                { id: 'service', label: 'Service', icon: <Wrench size={14} /> },
+                { id: 'ownership', label: 'Ownership', icon: <User size={14} /> },
+                { id: 'travel', label: 'Travel', icon: <Ship size={14} /> },
+                { id: 'accident', label: 'Accident', icon: <AlertTriangle size={14} />, badge: accidentCount > 0 ? accidentCount : null },
+              ].map((tab) => {
+                const isActive = activeTab === tab.id;
+                return (
+                  <Box
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    style={{
+                      position: 'relative',
+                      padding: '8px 16px',
+                      borderRadius: 999,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 8,
+                      whiteSpace: 'nowrap',
+                      fontWeight: isActive ? 700 : 500,
+                      color: isActive ? '#fff' : 'rgba(255,255,255,0.6)',
+                      transition: 'color 0.2s',
+                      zIndex: 1,
+                    }}
+                  >
+                    {isActive && (
+                      <motion.div
+                        layoutId="activeTabPassport"
+                        style={{
+                          position: 'absolute',
+                          inset: 0,
+                          backgroundColor: '#3b82f6',
+                          borderRadius: 999,
+                          zIndex: -1,
+                          boxShadow: '0 4px 12px rgba(59,130,246,0.3)',
+                        }}
+                        transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
+                      />
+                    )}
+                    <Box style={{ opacity: isActive ? 1 : 0.7 }}>{tab.icon}</Box>
+                    <Text fz={14} lh={1}>{tab.label}</Text>
+                    {tab.badge && (
+                      <Badge size="xs" color={isActive ? 'white' : 'red'} variant={isActive ? 'filled' : 'light'} circle style={{ color: isActive ? '#000' : undefined }}>
+                        {tab.badge}
+                      </Badge>
+                    )}
+                  </Box>
+                );
+              })}
+            </Box>
 
-            <Box p="xl" style={{ animation: 'tabSlideIn 0.25s ease' }}>
+            <Box p="xl" style={{ position: 'relative' }}>
               <Tabs.Panel value="timeline"><TabContent vehicle={vehicle} tabName="timeline" /></Tabs.Panel>
               <Tabs.Panel value="service"><TabContent vehicle={vehicle} tabName="service" /></Tabs.Panel>
               <Tabs.Panel value="ownership"><TabContent vehicle={vehicle} tabName="ownership" /></Tabs.Panel>
